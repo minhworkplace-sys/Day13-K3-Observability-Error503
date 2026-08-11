@@ -1,0 +1,3 @@
+prompt: day13-chat
+  v1  labels=[baseline, production]  dòng đầu: Feature={{feature}}
+  v2  labels=[candidate, latest]  dòng đầu: Feature={{feature}}

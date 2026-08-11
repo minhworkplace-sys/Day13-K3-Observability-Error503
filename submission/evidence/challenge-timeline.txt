@@ -3,11 +3,11 @@ Timeline challenge day13-k3-observability-v1 (5 request gửi song song, concurr
 t=0 là lúc handler nhận request đầu tiên. Client gửi cả 5 request gần như cùng lúc.
 
 correlation_id  session                 nhận (t+s)   trả (t+s)  latency_ms log  client chờ (s)
-req-a8276c71    k3-challenge-s01              0.00        2.66            2652            2.66
-req-8721beaf    k3-challenge-s02              2.66        5.32            2653            5.32
-req-d79c1273    k3-challenge-s04              5.32        7.98            2653            7.98
-req-bb580fc8    k3-challenge-s05              7.98       10.64            2654           10.64
-req-9cff6691    k3-challenge-s03             10.65       13.30            2652           13.30
+req-8947de70    k3-challenge-s04              0.00        2.66            2656            2.66
+req-45e27c51    k3-challenge-s01              2.67        5.32            2653            5.32
+req-0c10dc5c    k3-challenge-s03              5.33        7.99            2654            7.99
+req-f9e6db09    k3-challenge-s05              7.99       10.65            2654           10.65
+req-3c536744    k3-challenge-s02             10.66       13.32            2656           13.32
 
 Đọc bảng: mỗi request_received chỉ được ghi ngay sau khi response_sent của request
 trước hoàn tất, tức các request bị xử lý tuần tự chứ không song song. latency_ms trong

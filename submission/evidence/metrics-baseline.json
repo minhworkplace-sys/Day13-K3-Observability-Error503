@@ -1,1 +1,1 @@
-{"traffic":70,"latency_p50":152.0,"latency_p95":153.0,"latency_p99":1196.0,"avg_cost_usd":0.0021,"total_cost_usd":0.1458,"tokens_in_total":2310,"tokens_out_total":9261,"error_breakdown":{},"quality_avg":0.88}
+{"traffic":71,"latency_p50":152.0,"latency_p95":155.0,"latency_p99":1167.0,"avg_cost_usd":0.002,"total_cost_usd":0.1452,"tokens_in_total":2349,"tokens_out_total":9207,"error_breakdown":{},"quality_avg":0.8789}

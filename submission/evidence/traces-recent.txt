@@ -1,82 +1,82 @@
 20 trace (mới nhất trước):
 
-- id=da51a9ee148b5663e783422d75543cbb
-  ts=2026-08-11T05:51:59.959Z  name=chat-refund
+- id=990ea1364e693bee820268c27b2ea35d
+  ts=2026-08-11T06:36:19.461Z  name=chat-policy
+  user_id_hash=b5425fb56c62  session=prompt-version-compare  tags=[claude-sonnet-4-5,lab,policy]
+  latency=1.221  prompt_name=day13-chat prompt_label=baseline prompt_version=1 prompt_source=langfuse
+- id=d999a4e3af26909747bd9c6c62793615
+  ts=2026-08-11T06:32:06.443Z  name=chat-refund
+  user_id_hash=867738e76862  session=k3-challenge-s02  tags=[claude-sonnet-4-5,lab,refund]
+  latency=2.657  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=dad54f124a0ad75dbd87916c021fa8bf
+  ts=2026-08-11T06:32:03.773Z  name=chat-refund
+  user_id_hash=5da42a0d3d01  session=k3-challenge-s05  tags=[claude-sonnet-4-5,lab,refund]
+  latency=2.66  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=26ac2747fa8996cc5655b1c677afc1eb
+  ts=2026-08-11T06:32:01.112Z  name=chat-refund
   user_id_hash=b7fde6ae11b0  session=k3-challenge-s03  tags=[claude-sonnet-4-5,lab,refund]
   latency=2.656  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=17bcce72457d190b03321160264a5ceb
-  ts=2026-08-11T05:51:57.296Z  name=chat-refund
-  user_id_hash=5da42a0d3d01  session=k3-challenge-s05  tags=[claude-sonnet-4-5,lab,refund]
-  latency=2.655  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=e7f5ab37365da4f249972cea4cded6c7
-  ts=2026-08-11T05:51:54.638Z  name=chat-refund
-  user_id_hash=026017618b2c  session=k3-challenge-s04  tags=[claude-sonnet-4-5,lab,refund]
-  latency=2.652  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=cb6d899654f126d01e909e32c36b2f04
-  ts=2026-08-11T05:51:51.975Z  name=chat-refund
-  user_id_hash=867738e76862  session=k3-challenge-s02  tags=[claude-sonnet-4-5,lab,refund]
-  latency=2.655  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=0afa191ed8469d7a6783ac272f8d7f3b
-  ts=2026-08-11T05:51:49.317Z  name=chat-refund
+- id=fdca79d546269364a5fbc8fc754e3fb1
+  ts=2026-08-11T06:31:58.449Z  name=chat-refund
   user_id_hash=026c7a407135  session=k3-challenge-s01  tags=[claude-sonnet-4-5,lab,refund]
-  latency=2.653  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=5446e73823aa8278742c87d1685f16f4
-  ts=2026-08-11T05:51:46.778Z  name=chat-qa
+  latency=2.657  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=66470616960cb89fbde17b6ac0e2f0b8
+  ts=2026-08-11T06:31:55.786Z  name=chat-refund
+  user_id_hash=026017618b2c  session=k3-challenge-s04  tags=[claude-sonnet-4-5,lab,refund]
+  latency=2.656  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=9d2ed1f3c69fe86c300ff734725d684d
+  ts=2026-08-11T06:31:53.099Z  name=chat-qa
   user_id_hash=105a9cef3903  session=s10  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=ac9d8f40d89dfa28a62959e751091120
-  ts=2026-08-11T05:51:46.616Z  name=chat-qa
-  user_id_hash=4d14d5d4f719  session=s09  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=b23c8a6c346ced7721ce99153eb97ef8
-  ts=2026-08-11T05:51:46.450Z  name=chat-qa
-  user_id_hash=2f015d970c0b  session=s08  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.157  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=2e9c700e1395238b2634983bf32ad99d
-  ts=2026-08-11T05:51:46.291Z  name=chat-qa
-  user_id_hash=1632c29ecdec  session=s07  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.151  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=80a541b5143e45d0b19dfec929f7a72a
-  ts=2026-08-11T05:51:46.127Z  name=chat-summary
-  user_id_hash=4c4f62330d76  session=s06  tags=[claude-sonnet-4-5,lab,summary]
-  latency=0.156  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=e42d1d20c7e8a8dc4ef5335fd30722f9
-  ts=2026-08-11T05:51:45.962Z  name=chat-qa
-  user_id_hash=64f6ec689229  session=s05  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=501307af5b6746479bf3056d8e14bee6
-  ts=2026-08-11T05:51:45.781Z  name=chat-qa
-  user_id_hash=75af07890985  session=s04  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=071b8e2131025c00d224eecda1956bc8
-  ts=2026-08-11T05:51:45.621Z  name=chat-summary
-  user_id_hash=97ce842ec69d  session=s03  tags=[claude-sonnet-4-5,lab,summary]
-  latency=0.151  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=56e7ffbc95b43902b6fba1f6bb21b382
-  ts=2026-08-11T05:51:45.455Z  name=chat-qa
-  user_id_hash=95b6504a8bd6  session=s02  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.156  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=e101782c25c00a19016602529a2bd8a6
-  ts=2026-08-11T05:51:45.293Z  name=chat-qa
-  user_id_hash=2055254ee30a  session=s01  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.157  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=a02d3fba91a6665c42a261a8adcbb371
-  ts=2026-08-11T05:51:44.035Z  name=chat-qa
-  user_id_hash=105a9cef3903  session=s10  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.158  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=6f2013d29fe9f5bd704a9c0a87938ddc
-  ts=2026-08-11T05:51:43.870Z  name=chat-qa
-  user_id_hash=4d14d5d4f719  session=s09  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.162  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=7280ca388d688f57ef225b20cef6c6ee
-  ts=2026-08-11T05:51:43.716Z  name=chat-qa
-  user_id_hash=2f015d970c0b  session=s08  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=6dd74de5453ed8b2a11dabcdba853fa1
-  ts=2026-08-11T05:51:43.550Z  name=chat-qa
-  user_id_hash=1632c29ecdec  session=s07  tags=[claude-sonnet-4-5,lab,qa]
-  latency=0.156  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
-- id=097e1b834bb3cacb7c0600c494d0a4a5
-  ts=2026-08-11T05:51:43.349Z  name=chat-summary
-  user_id_hash=4c4f62330d76  session=s06  tags=[claude-sonnet-4-5,lab,summary]
   latency=0.153  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=2c6af0f2d3d9e36df8fa470d03b13347
+  ts=2026-08-11T06:31:52.927Z  name=chat-qa
+  user_id_hash=4d14d5d4f719  session=s09  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.158  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=aee24664c6789925bccbd1d3ad6ee4a6
+  ts=2026-08-11T06:31:52.752Z  name=chat-qa
+  user_id_hash=2f015d970c0b  session=s08  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.158  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=6aa65c465822608650b0db6366340034
+  ts=2026-08-11T06:31:52.583Z  name=chat-qa
+  user_id_hash=1632c29ecdec  session=s07  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.155  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=ecd913308a587dad7aeea1f63f9f413d
+  ts=2026-08-11T06:31:52.415Z  name=chat-summary
+  user_id_hash=4c4f62330d76  session=s06  tags=[claude-sonnet-4-5,lab,summary]
+  latency=0.158  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=41711fd58e6ea963843393bbf7ee8f6e
+  ts=2026-08-11T06:31:52.237Z  name=chat-qa
+  user_id_hash=64f6ec689229  session=s05  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.164  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=4bd181edd0e18703d45d63d918228b9d
+  ts=2026-08-11T06:31:52.064Z  name=chat-qa
+  user_id_hash=75af07890985  session=s04  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.16  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=5ba1208f64b4de41dd1c699a39d9c49e
+  ts=2026-08-11T06:31:51.887Z  name=chat-summary
+  user_id_hash=97ce842ec69d  session=s03  tags=[claude-sonnet-4-5,lab,summary]
+  latency=0.157  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=f851de825615abb798e2eaa8e852d546
+  ts=2026-08-11T06:31:51.715Z  name=chat-qa
+  user_id_hash=95b6504a8bd6  session=s02  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.154  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=8d3c92af15ec80afb7b152b808b3f495
+  ts=2026-08-11T06:31:51.523Z  name=chat-qa
+  user_id_hash=2055254ee30a  session=s01  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.163  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=02ee692c57c7e432aecfe5e010875a87
+  ts=2026-08-11T06:31:50.161Z  name=chat-qa
+  user_id_hash=105a9cef3903  session=s10  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.177  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=5f1bd868cf5a4404249cea69cd18a27a
+  ts=2026-08-11T06:31:49.972Z  name=chat-qa
+  user_id_hash=4d14d5d4f719  session=s09  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.159  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=43d43ebe94a250448f79b7e4963c7cfb
+  ts=2026-08-11T06:31:49.794Z  name=chat-qa
+  user_id_hash=2f015d970c0b  session=s08  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.16  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=e3f909d57a186bafd1a77c172dded998
+  ts=2026-08-11T06:31:49.622Z  name=chat-qa
+  user_id_hash=1632c29ecdec  session=s07  tags=[claude-sonnet-4-5,lab,qa]
+  latency=0.16  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse

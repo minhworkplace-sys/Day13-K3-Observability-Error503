@@ -17,7 +17,7 @@ Nguyễn Quốc Thịnh	2A202601675 SRE & Alerts Engineer
 
 | Hạng mục | Kết quả | Evidence |
 |---|---|---|
-| `validate_logs.py` | **100/100** — 153 record, 77 correlation ID, 0 thiếu field, 0 PII leak | `evidence/validate-logs.txt` |
+| `validate_logs.py` | **100/100** — 164 record, 81 correlation ID, 0 thiếu field, 0 PII leak | `evidence/validate-logs.txt` |
 | `validate_dashboard.py` | **HỢP LỆ: 6/6 panel** | `evidence/validate-dashboard.txt` |
 | Traces trên Langfuse | **20 trace gần nhất** đều có metadata đầy đủ và `prompt_source=langfuse`; mỗi trace có 3 observation (root generation + span `rag_retrieve` + span `llm_generate`) | `evidence/traces-recent.txt` (20 trace), `evidence/traces-challenge.txt` (6 trace kèm span), `evidence/traces-prompt-versions.txt` (4) |
 | PII leak còn lại | **0** | `evidence/validate-logs.txt` |
@@ -26,13 +26,13 @@ Nguyễn Quốc Thịnh	2A202601675 SRE & Alerts Engineer
 
 Môi trường: Python 3.11.9, Langfuse Cloud (`https://cloud.langfuse.com`), fake LLM nên không tốn API key trả phí.
 
-**Project Langfuse chứa evidence**: `cmso2fy6e03umad0cv9huvgox`. Toàn bộ trace ID trong báo cáo này chỉ mở được bằng cặp key của project đó — nếu chấm bằng key khác thì mọi link trace sẽ trả về 404. Prompt `day13-chat` (v1, v2) cũng nằm trong project này.
+**Project Langfuse chứa evidence**: `cmsoa3pmb00asad0ctyui0lc6`. Toàn bộ trace ID trong báo cáo này chỉ mở được bằng cặp key của project đó — nếu chấm bằng key khác thì mọi link trace sẽ trả về 404. Prompt `day13-chat` (v1, v2) cũng nằm trong project này.
 
 ## 3. Logging và tracing
 
 **Correlation ID** — `app/middleware.py` sinh ID dạng `req-<8 hex>` cho mỗi request, hoặc nhận lại `x-request-id` của client nếu ID đó khớp `^[A-Za-z0-9._-]{1,64}$` (ID từ client là dữ liệu không tin cậy, không cho ký tự lạ chui vào log). ID được `bind_contextvars` nên mọi log trong request tự mang theo, và trả về client qua header `x-request-id` + `x-response-time-ms`. Đầu mỗi request gọi `clear_contextvars()` để context không rò rỉ sang request khác.
 
-- Evidence correlation ID: `evidence/logs-challenge.jsonl` — mỗi cặp `request_received`/`response_sent` dùng chung một `correlation_id`, ví dụ `req-76c95062`.
+- Evidence correlation ID: `evidence/logs-challenge.jsonl` — mỗi cặp `request_received`/`response_sent` dùng chung một `correlation_id`, ví dụ `req-8947de70`.
 
 **Metadata** — `app/main.py` bind `user_id_hash`, `session_id`, `feature`, `model`, `env` cho toàn bộ log của request. `user_id` không bao giờ được ghi nguyên văn, chỉ ghi SHA-256 cắt 12 ký tự (`hash_user_id`).
 
@@ -59,9 +59,9 @@ Môi trường: Python 3.11.9, Langfuse Cloud (`https://cloud.langfuse.com`), fa
 
 Tách được ba span này là điều kiện để bước "khoanh vùng span bất thường" ở mục 6 có ý nghĩa: nếu chỉ instrument mỗi `run`, waterfall chỉ còn một thanh duy nhất và không chỉ ra được bước nào chậm.
 
-**Một span đáng chú ý** — trace `da51a9ee148b5663e783422d75543cbb` (session `k3-challenge-s03`) báo `latency=2.656s`, tách ra thành `rag_retrieve` **2.503s** và `llm_generate` **0.151s** — retrieval chiếm 94% thời gian. Nhưng client gửi request này phải chờ **13.30s**. Khoảng chênh 10.6s không nằm trong bất kỳ span nào — đó chính là manh mối của phần 6.
+**Một span đáng chú ý** — trace `26ac2747fa8996cc5655b1c677afc1eb` (session `k3-challenge-s03`) báo `latency=2.656s`, tách ra thành `rag_retrieve` **2.502s** và `llm_generate` **0.151s** — retrieval chiếm 94% thời gian. Nhưng client gửi request này phải chờ **13.32s**. Khoảng chênh 10.6s không nằm trong bất kỳ span nào — đó chính là manh mối của phần 6.
 
-- Evidence trace waterfall: ⬜ ảnh chụp trace `da51a9ee148b5663e783422d75543cbb` trên Langfuse (URL ở mục 8); bản text đầy đủ ở `evidence/traces-challenge.txt`.
+- Evidence trace waterfall: ⬜ ảnh chụp trace `26ac2747fa8996cc5655b1c677afc1eb` trên Langfuse (URL ở mục 8); bản text đầy đủ ở `evidence/traces-challenge.txt`.
 
 ## 4. Prompt versioning
 
@@ -75,12 +75,14 @@ Cả hai version được tạo bằng `scripts/prompt_ops.py setup` (script c�
 
 | Bước | Label khi chạy | Version thực tế | Trace ID |
 |---|---|---|---|
-| 1. Baseline | `baseline` | v1 | `5ce0000998e2f2ee528bd525fa156154` |
-| 2. Candidate | `candidate` | v2 | `47c4e2aab5e0e5ecaee39b10b38e1a50` |
-| 3. Sau khi promote | `production` | **v2** | `e9ce5109aba9fce1ff2b57261900dd54` |
-| 4. Sau khi rollback | `production` | **v1** | `d2111531d23f42988f9cc63f67f71bd7` |
+| 1. Baseline | `baseline` | v1 | `990ea1364e693bee820268c27b2ea35d` |
+| 2. Candidate | `candidate` | v2 | `d45ce957807e0abcc273300f2bf2fc2b` |
+| 3. Sau khi promote | `production` | **v2** | `58a852af0632b9067622a8f5e444aca4` |
+| 4. Sau khi rollback | `production` | **v1** | `7e6cec84e7373e311a92986e53da9f67` |
 
-Cả bốn trace đều có `prompt_source=langfuse` — tức app thật sự lấy prompt managed chứ không rơi về template local. (Đã kiểm tra lại bằng API: cả bốn trace ID này vẫn tồn tại trong project `cmso2fy6e03umad0cv9huvgox`, và `GET /api/public/v2/prompts` trả về `day13-chat` với `versions: [1, 2]`.)
+Bước 3 và 4 là bằng chứng chính: cùng label `production`, cùng input, nhưng version thực tế đổi từ v2 sang v1 — đúng một vòng promote rồi rollback. Trace bước 1 được chạy lại sau cùng (06:36) nên đứng đầu file evidence; đọc theo cột label/version chứ không theo thứ tự thời gian.
+
+Cả bốn trace đều có `prompt_source=langfuse` — tức app thật sự lấy prompt managed chứ không rơi về template local. (Đã kiểm tra lại bằng API: cả bốn trace ID này vẫn tồn tại trong project `cmsoa3pmb00asad0ctyui0lc6`, và `GET /api/public/v2/prompts` trả về `day13-chat` với `versions: [1, 2]`.)
 
 **Bằng chứng đổi label và rollback** — hai trace cuối chứng minh vòng promote → rollback:
 
@@ -91,7 +93,7 @@ python scripts/prompt_ops.py label --version 1 --labels production baseline    #
 
 Trạng thái label sau khi rollback: `v1 = [baseline, production]`, `v2 = [candidate, latest]`.
 
-- Evidence text: `evidence/traces-prompt-versions.txt`
+- Evidence text: `evidence/traces-prompt-versions.txt` (4 trace) và `evidence/prompt-labels-after-rollback.txt` (trạng thái label sau rollback, in bằng `prompt_ops.py list`)
 - ⬜ Ảnh danh sách hai prompt version trên Langfuse
 - ⬜ Ảnh trước/sau khi đổi label `production`
 
@@ -103,18 +105,18 @@ Trạng thái label sau khi rollback: `v1 = [baseline, production]`, `v2 = [cand
 
 | Panel | Trước sự cố | Sau sự cố | Threshold | Trạng thái |
 |---|---|---|---|---|
-| latency | p95 = 153 ms | **p95 = 2.652 ms** | p95 ≤ 3.000 ms | đạt (sát ngưỡng) |
-| traffic | 35,00 req/phút | 37,50 req/phút | rate ≥ 1/phút | đạt |
+| latency | p95 = 1.167 ms | **p95 = 2.654 ms** | p95 ≤ 3.000 ms | đạt (sát ngưỡng) |
+| traffic | 18,50 req/phút | 19,75 req/phút | rate ≥ 1/phút | đạt |
 | errors | 0,00% | 0,00% | ≤ 2% | đạt |
-| cost | $0,1458 | $0,1565 | tổng ≤ $2,5 | đạt |
-| tokens | 9.261 | 9.940 | mỗi field ≤ 50.000 | đạt |
-| quality | 0,880 | 0,879 | mean ≥ 0,75 | đạt |
+| cost | $0,1523 | $0,1638 | tổng ≤ $2,5 | đạt |
+| tokens | 9.657 | 10.389 | mỗi field ≤ 50.000 | đạt |
+| quality | 0,876 | 0,875 | mean ≥ 0,75 | đạt |
 
-Cột "trước sự cố" dựng từ log đã lọc bỏ các session `k3-challenge-*`; cột "sau sự cố" là toàn bộ log trong cùng cửa sổ 60 phút. Chỉ đúng một panel đổi trạng thái đáng kể — latency — còn năm panel kia gần như đứng yên; đó là lý do phần điều tra ở mục 6 chỉ đi theo hướng latency.
+Cột "trước sự cố" dựng từ log đã lọc bỏ các session `k3-challenge-*`; cột "sau sự cố" là toàn bộ log trong cùng cửa sổ 60 phút. p95 của cột trước sự cố là 1.167 ms chứ không phải ~155 ms như `/metrics` báo, vì cửa sổ 60 phút của dashboard bao cả bốn request so sánh prompt version — mỗi lần khởi động lại app, request đầu tiên phải fetch prompt từ Langfuse nên mất ~1,2s. Đó là chi phí khởi động, không phải sự cố. Chỉ đúng một panel đổi trạng thái đáng kể — latency — còn năm panel kia gần như đứng yên; đó là lý do phần điều tra ở mục 6 chỉ đi theo hướng latency.
 
 - Evidence dashboard: `evidence/dashboard.html` (sau) và `evidence/dashboard-baseline.html` (trước). ⬜ Chụp màn hình cả hai (đã hiện sẵn tên panel, time range 60 phút, refresh 30s, đơn vị và threshold).
 
-**SLO đã chọn và lý do** (`config/slo.yaml`) — bốn SLI bám đúng bốn nhóm rủi ro khác nhau: latency p95 ≤ 3000ms (trải nghiệm chờ), error rate ≤ 2% (lỗi thấy được), cost ≤ $2,5/ngày (ngân sách), quality mean ≥ 0,75 (lỗi âm thầm mà hai chỉ số đầu không bắt được). Baseline đo được p95 = 153 ms nên ngưỡng 3.000 ms còn rất nhiều dư địa; đây là lựa chọn có chủ ý để alert chỉ kêu khi thực sự bất thường. Mặt trái của biên rộng đó lộ ra ngay trong challenge: sự cố đẩy p95 lên 2.652 ms, gấp 17 lần baseline mà vẫn không chạm ngưỡng — xem mục 6.
+**SLO đã chọn và lý do** (`config/slo.yaml`) — bốn SLI bám đúng bốn nhóm rủi ro khác nhau: latency p95 ≤ 3000ms (trải nghiệm chờ), error rate ≤ 2% (lỗi thấy được), cost ≤ $2,5/ngày (ngân sách), quality mean ≥ 0,75 (lỗi âm thầm mà hai chỉ số đầu không bắt được). Baseline đo được p95 = 155 ms nên ngưỡng 3.000 ms còn rất nhiều dư địa; đây là lựa chọn có chủ ý để alert chỉ kêu khi thực sự bất thường. Mặt trái của biên rộng đó lộ ra ngay trong challenge: sự cố đẩy p95 lên 2.654 ms, gấp 17 lần baseline mà vẫn không chạm ngưỡng — xem mục 6.
 
 **Alert rules và runbook** (`config/alert_rules.yaml` + `docs/alerts.md`) — bốn alert, tất cả đều dựa trên triệu chứng người dùng hoặc SLO, không dựa vào tên hàm nội bộ:
 
@@ -141,20 +143,20 @@ Năm mục dưới đây bám đúng năm bước của Checkpoint 3: chạy inc
 
 `/metrics` trước và sau khi bật incident (`evidence/metrics-baseline.json`, `evidence/metrics-incident.json`):
 
-| Chỉ số | Baseline (70 request) | Trong sự cố (+5 request challenge) |
+| Chỉ số | Baseline (71 request) | Trong sự cố (+5 request challenge) |
 |---|---|---|
 | latency_p50 | 152 ms | 152 ms |
-| **latency_p95** | **153 ms** | **2.652 ms** (+2.499 ms) |
-| latency_p99 | 1.196 ms | 2.654 ms |
-| traffic | 70 | 75 |
+| **latency_p95** | **155 ms** | **2.654 ms** (+2.499 ms) |
+| latency_p99 | 1.167 ms | 2.656 ms |
+| traffic | 71 | 76 |
 | error_breakdown | {} | {} |
-| quality_avg | 0,880 | 0,879 |
+| quality_avg | 0,879 | 0,878 |
 
 p50 gần như không đổi còn p95 tăng gấp đôi — dấu hiệu kinh điển của chậm ở phần đuôi, chỉ một nhóm request bị ảnh hưởng chứ không phải cả hệ thống. Không có lỗi nào (`error_breakdown` rỗng ở cả hai lần đo) và quality gần như không đổi (0,88 → 0,873), nên đây là sự cố latency thuần tuý chứ không phải lỗi chất lượng hay lỗi tool. Nhóm request bị ảnh hưởng chính là feature `refund` — đúng `affected_feature` mà challenge khai báo.
 
 p95 = 2.651 ms đã vượt `latency_threshold_ms = 2000` của challenge, nhưng **vẫn dưới SLO 3.000 ms của nhóm** — chi tiết này quay lại ở phần root cause.
 
-**Nhưng client lại đo được 10,7s đến 13,3s** cho chính năm request đó (output `load_test.py`: 10.661 / 13.323 / 13.322 / 13.321 / 13.322 ms). Chênh lệch giữa 2,65s mà server báo và 13,3s mà người dùng chịu chính là phần đáng điều tra nhất.
+**Nhưng client lại đo được 10,7s đến 13,3s** cho chính năm request đó (output `load_test.py`: 10.674 / 10.679 / 13.339 / 13.342 / 13.346 ms). Chênh lệch giữa 2,65s mà server báo và 13,3s mà người dùng chịu chính là phần đáng điều tra nhất.
 
 ### Trace: khoanh vùng span bất thường
 
@@ -162,12 +164,12 @@ Năm trace của challenge (`evidence/traces-challenge.txt`), nối với log qu
 
 | Session | Trace ID | Tổng trace | span `rag_retrieve` | span `llm_generate` |
 |---|---|---|---|---|
-| k3-challenge-s01 | `0afa191ed8469d7a6783ac272f8d7f3b` | 2,653s | **2,502s** | 0,151s |
-| k3-challenge-s02 | `cb6d899654f126d01e909e32c36b2f04` | 2,655s | **2,502s** | 0,152s |
-| k3-challenge-s03 | `da51a9ee148b5663e783422d75543cbb` | 2,656s | **2,503s** | 0,151s |
-| k3-challenge-s04 | `e7f5ab37365da4f249972cea4cded6c7` | 2,652s | **2,500s** | 0,152s |
-| k3-challenge-s05 | `17bcce72457d190b03321160264a5ceb` | 2,655s | **2,501s** | 0,151s |
-| (đối chứng) s10, feature `qa` | `5446e73823aa8278742c87d1685f16f4` | 0,154s | 0,000s | 0,153s |
+| k3-challenge-s01 | `fdca79d546269364a5fbc8fc754e3fb1` | 2,657s | **2,503s** | 0,152s |
+| k3-challenge-s02 | `d999a4e3af26909747bd9c6c62793615` | 2,657s | **2,501s** | 0,154s |
+| k3-challenge-s03 | `26ac2747fa8996cc5655b1c677afc1eb` | 2,656s | **2,502s** | 0,151s |
+| k3-challenge-s04 | `66470616960cb89fbde17b6ac0e2f0b8` | 2,656s | **2,501s** | 0,154s |
+| k3-challenge-s05 | `dad54f124a0ad75dbd87916c021fa8bf` | 2,660s | **2,506s** | 0,153s |
+| (đối chứng) s10, feature `qa` | `9d2ed1f3c69fe86c300ff734725d684d` | 0,153s | 0,000s | 0,153s |
 
 Đây chính là bước khoanh vùng: span `rag_retrieve` chiếm **94%** thời gian của trace, còn `llm_generate` giữ nguyên 0,15s như lúc khỏe mạnh. Trace đối chứng ở dòng cuối (chạy khi incident đã tắt) cho thấy `rag_retrieve` bình thường tốn 0,000s — vậy toàn bộ 2,5s là do bước retrieval, không phải do LLM, không phải do prompt.
 
@@ -179,11 +181,11 @@ Nhưng trace **không** giải thích được vì sao request cuối phải ch�
 
 ```
 correlation_id  session                 nhận (t+s)   trả (t+s)  latency_ms log  client chờ (s)
-req-a8276c71    k3-challenge-s01              0.00        2.66            2652            2.66
-req-8721beaf    k3-challenge-s02              2.66        5.32            2653            5.32
-req-d79c1273    k3-challenge-s04              5.32        7.98            2653            7.98
-req-bb580fc8    k3-challenge-s05              7.98       10.64            2654           10.64
-req-9cff6691    k3-challenge-s03             10.65       13.30            2652           13.30
+req-8947de70    k3-challenge-s04              0.00        2.66            2656            2.66
+req-45e27c51    k3-challenge-s01              2.67        5.32            2653            5.32
+req-0c10dc5c    k3-challenge-s03              5.33        7.99            2654            7.99
+req-f9e6db09    k3-challenge-s05              7.99       10.65            2654           10.65
+req-3c536744    k3-challenge-s02             10.66       13.32            2656           13.32
 ```
 
 Năm request được client gửi song song, nhưng log `request_received` của mỗi request chỉ được ghi **đúng vào lúc** request trước ghi `response_sent`. Chúng bị xử lý tuần tự, mỗi lượt cách nhau đúng 2,65s. Bảng này dựng lại được bằng `python scripts/challenge_timeline.py`.
@@ -197,7 +199,7 @@ Hai nguyên nhân chồng lên nhau:
 
 Bằng chứng cho điểm 2 nằm ở cột "nhận (t+s)": nếu app xử lý song song đúng nghĩa, cả năm `request_received` phải được ghi gần như cùng lúc và cả năm request cùng xong sau ~2,65s. Việc chúng cách nhau đều đặn 2,65s chỉ có thể xảy ra khi event loop bị chặn.
 
-**Điểm mù quan sát đi kèm** — `latency_ms` được đo bên trong `LabAgent.run`, tức chỉ tính từ lúc request giành được event loop. Nó bỏ qua toàn bộ thời gian xếp hàng. Hệ quả trực tiếp: dashboard báo p95 = 2.652 ms, **vẫn dưới SLO 3.000 ms**, nên `chat_latency_p95_slo_breach` sẽ **không kêu** trong khi người dùng đang chờ 13,3 giây — sai số gấp 5 lần. Sự cố này lẽ ra lọt lưới hoàn toàn.
+**Điểm mù quan sát đi kèm** — `latency_ms` được đo bên trong `LabAgent.run`, tức chỉ tính từ lúc request giành được event loop. Nó bỏ qua toàn bộ thời gian xếp hàng. Hệ quả trực tiếp: dashboard báo p95 = 2.654 ms, **vẫn dưới SLO 3.000 ms**, nên `chat_latency_p95_slo_breach` sẽ **không kêu** trong khi người dùng đang chờ 13,3 giây — sai số gấp 5 lần. Sự cố này lẽ ra lọt lưới hoàn toàn.
 
 **Điểm mù thứ hai — trace không có span con.** Ở lần chạy đầu, `retrieve` và `generate` chưa được instrument riêng nên mỗi trace chỉ có đúng một observation: waterfall là một thanh 2,65s duy nhất, không chỉ ra được bước nào chậm. Bước "dùng trace để khoanh vùng span bất thường" khi đó không thực hiện được — chỉ có thể đoán từ code. Nhóm đã thêm span `rag_retrieve` và `llm_generate` rồi chạy lại challenge; số liệu ở mục này là của lần chạy sau. Bài học: **một trace không có span con thì không phải công cụ chẩn đoán, nó chỉ là một cái đồng hồ bấm giờ.**
 
@@ -243,10 +245,10 @@ Chỉ còn năm ảnh phải chụp tay, lưu vào `submission/evidence/` đúng
 | `prompt-label-rollback.png` | Langfuse → `day13-chat`, trạng thái label sau rollback (`v1 = baseline, production`) | Mục 4 |
 | `dashboard.png` / `dashboard-baseline.png` | Mở `evidence/dashboard.html` và `evidence/dashboard-baseline.html` bằng trình duyệt rồi chụp | Mục 5 |
 
-URL trace waterfall (đăng nhập Langfuse bằng tài khoản sở hữu project `cmso2fy6e03umad0cv9huvgox`):
+URL trace waterfall (đăng nhập Langfuse bằng tài khoản sở hữu project `cmsoa3pmb00asad0ctyui0lc6`):
 
 ```
-https://cloud.langfuse.com/project/cmso2fy6e03umad0cv9huvgox/traces/da51a9ee148b5663e783422d75543cbb
+https://cloud.langfuse.com/project/cmsoa3pmb00asad0ctyui0lc6/traces/26ac2747fa8996cc5655b1c677afc1eb
 ```
 
 Đã có sẵn: `health.png` (checkpoint 0) và `cp1.png` (checkpoint 1).

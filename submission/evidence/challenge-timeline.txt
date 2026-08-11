@@ -1,0 +1,15 @@
+Timeline challenge day13-k3-observability-v1 (5 request gửi song song, concurrency=5)
+
+t=0 là lúc handler nhận request đầu tiên. Client gửi cả 5 request gần như cùng lúc.
+
+correlation_id  session               nhận (t+s)   trả (t+s)  latency_ms log  client chờ (s)
+req-76c95062    k3-challenge-s02            0.00        2.65            2651            2.65
+req-965143c8    k3-challenge-s01            2.66        5.31            2651            5.31
+req-e36f3059    k3-challenge-s05            5.31        7.96            2651            7.96
+req-c74c74a2    k3-challenge-s04            7.97       10.62            2651           10.62
+req-101a0b2f    k3-challenge-s03           10.63       13.28            2651           13.28
+
+Đọc bảng: mỗi request_received chỉ được ghi ngay sau khi response_sent của request
+trước hoàn tất, tức các request bị xử lý tuần tự chứ không song song. latency_ms trong
+log giữ nguyên ~2651ms cho mọi request vì nó chỉ đo bên trong LabAgent.run và bỏ qua
+thời gian request nằm chờ tới lượt.

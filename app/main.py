@@ -13,7 +13,7 @@ from .metrics import record_error, snapshot
 from .middleware import CorrelationIdMiddleware
 from .pii import hash_user_id, summarize_text
 from .schemas import ChatRequest, ChatResponse
-from .tracing import tracing_enabled
+from .tracing import get_langfuse_client, tracing_enabled
 
 configure_logging()
 log = get_logger()
@@ -32,6 +32,15 @@ async def startup() -> None:
     )
 
 
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    # Langfuse gửi trace theo batch nền; không flush khi tắt là mất trace của những
+    # request cuối cùng — đúng lúc điều tra sự cố lại cần chúng nhất.
+    if tracing_enabled():
+        get_langfuse_client().flush()
+    log.info("app_stopped", service=os.getenv("APP_NAME", "day13-observability-lab"))
+
+
 @app.get("/health")
 async def health() -> dict:
     return {"ok": True, "tracing_enabled": tracing_enabled(), "incidents": status()}
@@ -44,9 +53,15 @@ async def metrics() -> dict:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
-    # TODO: Enrich logs with request context (user_id_hash, session_id, feature, model, env)
-    # bind_contextvars(...)
-    
+    # Gắn context cho toàn bộ log của request này; user_id luôn được hash, không log nguyên văn.
+    bind_contextvars(
+        user_id_hash=hash_user_id(body.user_id),
+        session_id=body.session_id,
+        feature=body.feature,
+        model=agent.model,
+        env=os.getenv("APP_ENV", "dev"),
+    )
+
     log.info(
         "request_received",
         service="api",

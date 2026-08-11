@@ -4,7 +4,10 @@ slis:
   latency_p95_ms:
     objective: 3000
     target: 99.5
-    note: Replace with your group's target
+    note: >-
+      Baseline đo được ~200ms nên 3000ms là ngưỡng rất rộng; giữ nguyên để cùng
+      giá trị với panel latency và alert chat_latency_p95_slo_breach. Incident
+      rag_slow thêm 2500ms vào mỗi request nên sẽ phá ngưỡng này ngay.
   error_rate_pct:
     objective: 2
     target: 99.0

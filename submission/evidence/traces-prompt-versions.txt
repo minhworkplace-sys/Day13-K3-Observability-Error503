@@ -1,0 +1,18 @@
+4 trace (mới nhất trước):
+
+- id=d2111531d23f42988f9cc63f67f71bd7
+  ts=2026-08-11T03:32:09.036Z  name=run
+  user_id_hash=df173cf119a8  session=prompt-version-compare  tags=[claude-sonnet-4-5,lab,policy]
+  latency=1.262  prompt_name=day13-chat prompt_label=production prompt_version=1 prompt_source=langfuse
+- id=e9ce5109aba9fce1ff2b57261900dd54
+  ts=2026-08-11T03:31:46.525Z  name=run
+  user_id_hash=df173cf119a8  session=prompt-version-compare  tags=[claude-sonnet-4-5,lab,policy]
+  latency=1.283  prompt_name=day13-chat prompt_label=production prompt_version=2 prompt_source=langfuse
+- id=47c4e2aab5e0e5ecaee39b10b38e1a50
+  ts=2026-08-11T03:31:23.987Z  name=run
+  user_id_hash=df173cf119a8  session=prompt-version-compare  tags=[claude-sonnet-4-5,lab,policy]
+  latency=1.247  prompt_name=day13-chat prompt_label=candidate prompt_version=2 prompt_source=langfuse
+- id=5ce0000998e2f2ee528bd525fa156154
+  ts=2026-08-11T03:31:06.922Z  name=run
+  user_id_hash=df173cf119a8  session=prompt-version-compare  tags=[claude-sonnet-4-5,lab,policy]
+  latency=1.353  prompt_name=day13-chat prompt_label=baseline prompt_version=1 prompt_source=langfuse

@@ -9,14 +9,8 @@ PII_PATTERNS: dict[str, str] = {
     "credit_card": r"\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b",
     "phone_vn": r"(?<!\d)(?:\+84|0)(?:[ .-]?\d){9}(?!\d)",
     "cccd": r"\b\d{12}\b",
-    # Hộ chiếu VN: 1 chữ cái + 7 chữ số, ví dụ B1234567.
-    "passport_vn": r"\b[A-Z]\d{7}\b",
-    # Địa chỉ VN: số nhà + từ khoá đơn vị hành chính, ví dụ "số 12 đường Láng, quận Đống Đa".
-    "address_vn": (
-        r"(?i)\b(?:số\s*)?\d{1,4}(?:/\d{1,4})*\s+"
-        r"(?:đường|phố|ngõ|hẻm|ấp|thôn|khu\s*phố|phường|xã|quận|huyện|tỉnh|tp\.?|thành\s*phố)"
-        r"\s+[^\n,.;]{1,40}"
-    ),
+    "credit_card": r"\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b",
+    "passport": r"\b[A-Z]\d{7,8}\b",
 }
 
 

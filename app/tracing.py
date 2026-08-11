@@ -23,6 +23,18 @@ except ImportError:  # pragma: no cover - chỉ dùng khi chưa cài requirement
         def update_current_generation(self, **kwargs: Any) -> None:
             return None
 
+        def update_current_span(self, **kwargs: Any) -> None:
+            return None
+
+        def score_current_trace(self, **kwargs: Any) -> None:
+            return None
+
+        def score_current_span(self, **kwargs: Any) -> None:
+            return None
+
+        def flush(self) -> None:
+            return None
+
     def get_client():
         return _DummyClient()
 
@@ -35,3 +47,12 @@ def tracing_enabled() -> bool:
     return LANGFUSE_SDK_AVAILABLE and bool(
         os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY")
     )
+
+
+def flush_langfuse() -> None:
+    if tracing_enabled():
+        try:
+            get_langfuse_client().flush()
+        except Exception:
+            pass
+

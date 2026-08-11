@@ -13,7 +13,7 @@ from .metrics import record_error, snapshot
 from .middleware import CorrelationIdMiddleware
 from .pii import hash_user_id, summarize_text
 from .schemas import ChatRequest, ChatResponse
-from .tracing import get_langfuse_client, tracing_enabled
+from .tracing import flush_langfuse, tracing_enabled
 
 configure_logging()
 log = get_logger()
@@ -34,11 +34,7 @@ async def startup() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
-    # Langfuse gửi trace theo batch nền; không flush khi tắt là mất trace của những
-    # request cuối cùng — đúng lúc điều tra sự cố lại cần chúng nhất.
-    if tracing_enabled():
-        get_langfuse_client().flush()
-    log.info("app_stopped", service=os.getenv("APP_NAME", "day13-observability-lab"))
+    flush_langfuse()
 
 
 @app.get("/health")
@@ -53,7 +49,6 @@ async def metrics() -> dict:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
-    # Gắn context cho toàn bộ log của request này; user_id luôn được hash, không log nguyên văn.
     bind_contextvars(
         user_id_hash=hash_user_id(body.user_id),
         session_id=body.session_id,

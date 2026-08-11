@@ -44,8 +44,11 @@ class LabAgent:
         cost_usd = self._estimate_cost(response.usage.input_tokens, response.usage.output_tokens)
 
         langfuse_client.update_current_trace(
+            name=f"chat-{feature}",
             user_id=hash_user_id(user_id),
             session_id=session_id,
+            input={"message": message},
+            output={"answer": response.text},
             tags=["lab", feature, self.model],
             metadata={
                 "prompt_name": prompt.name,
@@ -55,7 +58,10 @@ class LabAgent:
             },
         )
         langfuse_client.update_current_generation(
+            name=f"llm-generate-{self.model}",
             model=self.model,
+            input=prompt.text,
+            output=response.text,
             metadata={
                 "doc_count": len(docs),
                 "query_preview": summarize_text(message),
@@ -72,6 +78,15 @@ class LabAgent:
             cost_details={"total": cost_usd},
             prompt=prompt.managed_prompt,
         )
+
+        try:
+            langfuse_client.score_current_trace(
+                name="heuristic_quality",
+                value=quality_score,
+                comment="Automated quality heuristic score",
+            )
+        except Exception:
+            pass
 
         metrics.record_request(
             latency_ms=latency_ms,

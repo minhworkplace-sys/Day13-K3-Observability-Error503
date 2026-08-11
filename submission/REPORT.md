@@ -5,10 +5,13 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm: ⬜
-- Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability
+- Tên nhóm: Error503
+- Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability-Error503
 - Commit SHA cuối: ⬜ (điền sau khi commit phần việc của lab)
-- Thành viên và vai trò: ⬜
+- Thành viên và vai trò: 
+Nguyễn Hoàng Minh	2A202601229 QA
+Nguyễn Gia Thiều	2A202601759 Backend Engineer
+Nguyễn Quốc Thịnh	2A202601675 SRE & Alerts Engineer
 
 ## 2. Kết quả kỹ thuật
 

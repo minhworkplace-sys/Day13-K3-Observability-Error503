@@ -1,0 +1,35 @@
+# Alert dựa trên triệu chứng người dùng và SLO trong config/slo.yaml.
+# Nguồn dữ liệu: data/logs.jsonl, cùng field với 6 panel trong config/dashboard.yaml.
+alerts:
+  - name: chat_latency_p95_slo_breach
+    severity: high
+    condition: >-
+      p95(latency_ms) của event response_sent trong cửa sổ trượt 5 phút > 3000ms,
+      duy trì liên tục 5 phút và có tối thiểu 20 request trong cửa sổ
+    type: symptom-based
+    owner: Dashboard, SLO & Alert
+    runbook: docs/alerts.md#alert-1
+  - name: chat_error_rate_slo_breach
+    severity: critical
+    condition: >-
+      count(request_failed) / count(request_received) trong cửa sổ trượt 10 phút > 2%,
+      duy trì liên tục 10 phút và có tối thiểu 20 request trong cửa sổ
+    type: symptom-based
+    owner: Incident, Report & Demo
+    runbook: docs/alerts.md#alert-2
+  - name: chat_quality_proxy_drop
+    severity: warning
+    condition: >-
+      mean(quality_score) của event response_sent trong cửa sổ trượt 15 phút < 0.75,
+      duy trì liên tục 15 phút và có tối thiểu 30 request trong cửa sổ
+    type: symptom-based
+    owner: Tracing & Prompt Version
+    runbook: docs/alerts.md#alert-3
+  - name: chat_daily_cost_budget_burn
+    severity: warning
+    condition: >-
+      sum(cost_usd) của event response_sent tính từ 00:00 UTC > 2.0 USD
+      (80% ngân sách 2.5 USD/ngày trong config/slo.yaml)
+    type: symptom-based
+    owner: Dashboard, SLO & Alert
+    runbook: docs/alerts.md#alert-4

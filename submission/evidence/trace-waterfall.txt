@@ -1,0 +1,27 @@
+Trace waterfall đầy đủ — session k3-challenge-s03 (incident rag_slow đang bật)
+
+URL   : https://cloud.langfuse.com/project/cmso2fy6e03umad0cv9huvgox/traces/da51a9ee148b5663e783422d75543cbb
+Trace : da51a9ee148b5663e783422d75543cbb
+Name  : chat-refund   Session: k3-challenge-s03   User: b7fde6ae11b0
+Tags  : claude-sonnet-4-5,lab,refund
+Tổng  : 2.656s
+
+Metadata: prompt_name=day13-chat  prompt_label=production  prompt_version=1  prompt_source=langfuse
+
+span                                bắt đầu (t+s)  kết thúc (t+s)  thời lượng  % trace
+
+llm-generate-claude-sonnet-4-5              0.000           2.656      2.656s   100.0%
+  └ rag_retrieve                            0.000           2.503      2.503s    94.2%
+  └ llm_generate                            2.503           2.654      0.151s     5.7%
+
+Biểu đồ (mỗi ký tự ≈ 49ms):
+
+llm-generate-claude-sonnet-4-5  |██████████████████████████████████████████████████████
+└ rag_retrieve                  |██████████████████████████████████████████████████
+└ llm_generate                  |                                                  ███
+
+Đọc waterfall: rag_retrieve chiếm gần trọn chiều dài trace, llm_generate chỉ là
+vệt ngắn ở cuối. Đây là bước khoanh vùng span bất thường của checkpoint 3 —
+độ trễ nằm ở retrieval, không phải ở LLM và không phải ở prompt.
+Trace đối chứng khi incident đã tắt (evidence/traces-challenge.txt, session s10)
+có rag_retrieve = 0.000s và tổng trace 0.154s.

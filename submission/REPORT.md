@@ -38,7 +38,15 @@ Môi trường: Python 3.11.9, Langfuse Cloud (`https://cloud.langfuse.com`), fa
 
 **PII redaction** — `scrub_event` được đăng ký trong pipeline `structlog` **trước** processor ghi file, nên dữ liệu chưa che không bao giờ chạm đĩa. Pattern trong `app/pii.py`: email, thẻ tín dụng, số điện thoại VN (5 định dạng), CCCD 12 số, hộ chiếu VN, địa chỉ VN theo số nhà + từ khoá hành chính.
 
-- Evidence PII redaction: log của `u01` (input có `student@vinuni.edu.vn`) ghi `message_preview` thành `[REDACTED_EMAIL]`; `u05` (`0987654321`) và `u09` (thẻ `4111 1111 1111 1111`) tương tự. `validate_logs.py` quét PII bằng regex độc lập với code redaction và báo 0 leak.
+- Evidence PII redaction (`evidence/pii-redaction.txt`, dựng bằng `scripts/pii_evidence.py`):
+
+| Session | Input thô | Log ghi ra |
+|---|---|---|
+| s01 | `...My email is student@vinuni.edu.vn` | `...My email is [REDACTED_EMAIL]` |
+| s05 | `Here is my phone 0987654321, ...` | `Here is my phone [REDACTED_PHONE_VN], ...` |
+| s09 | `...credit card 4111 1111 1111 1111?` | `...credit card [REDACTED_CREDIT_CARD]?` |
+
+`user_id` `u01`/`u05`/`u09` chỉ xuất hiện dưới dạng hash (`2055254ee30a`, `64f6ec689229`, `4d14d5d4f719`). Quét lại 42 log record của ba session này bằng bộ regex của `validate_logs.py` — độc lập với `app/pii.py` — cho **0 chuỗi PII còn sót**.
 - PII trong trace: cả `rag_retrieve` và `llm_generate` đều đặt `capture_input=False, capture_output=False`. Nếu để mặc định, Langfuse sẽ lưu nguyên câu hỏi thô của người dùng — log đã che rồi mà trace vẫn giữ bản chưa che thì coi như chưa che.
 
 **Cấu trúc span** — mỗi request tạo 3 observation:
@@ -222,9 +230,11 @@ Các commit `b95464c`, `f1a02e5`, `7a57bfb`, `cd84f4f` là của Lab Coach (`Hun
 
 Nhánh `feature/thieu` đã được merge vào nhánh nộp (`318ba6f`), nên `evidence/cp1.png` có mặt trong bài.
 
-## 8. Checklist ảnh chụp còn thiếu
+## 8. Evidence và checklist ảnh còn thiếu
 
-Toàn bộ số liệu và evidence dạng text/HTML đã đủ. Chỉ còn bốn ảnh phải chụp tay, lưu vào `submission/evidence/` đúng tên dưới đây:
+Bảng đối chiếu đầy đủ với checklist trong `SUBMISSION.md` nằm ở [`evidence/INDEX.md`](evidence/INDEX.md). Tóm tắt: 8/8 mục bắt buộc đã có evidence dạng text/JSON/HTML, gồm cả `pii-redaction.txt` (bằng chứng redact), `trace-waterfall.txt` (waterfall dạng bảng + biểu đồ) và bản sao `alert_rules.yaml`/`alerts-runbook.md`/`slo.yaml`.
+
+Chỉ còn năm ảnh phải chụp tay, lưu vào `submission/evidence/` đúng tên dưới đây:
 
 | File cần chụp | Chụp ở đâu | Phục vụ mục nào |
 |---|---|---|
@@ -257,6 +267,7 @@ python scripts/inject_incident.py                   # bật incident chính th�
 python scripts/load_test.py --challenge --concurrency 5
 python scripts/inject_incident.py --disable
 python scripts/challenge_timeline.py                # logs-challenge.jsonl + timeline
+python scripts/pii_evidence.py                      # pii-redaction.txt (exit 1 nếu còn PII)
 python scripts/trace_evidence.py --since-minutes 4 --limit 6 --spans \
        --out submission/evidence/traces-challenge.txt
 python -m pytest -q                                 # 22 passed
@@ -267,7 +278,7 @@ Hai lưu ý khi chạy lại:
 - `data/logs.jsonl` tích luỹ qua nhiều lần chạy. Nếu file còn log của lần chạy **trước khi** có code enrichment thì `validate_logs.py` sẽ trừ điểm cho chính những record cũ đó (nhóm gặp đúng lỗi này: 50/100 với 20 record cũ). Đổi tên file cũ đi rồi chạy lại là sạch.
 - `load_test.py` và `inject_incident.py` nhận biến môi trường `LAB_BASE_URL` (mặc định `http://127.0.0.1:8000`) để chạy được khi cổng 8000 đang bận.
 
-Script của nhóm (không có sẵn trong repo gốc): `scripts/render_dashboard.py`, `scripts/prompt_ops.py`, `scripts/trace_evidence.py`, `scripts/challenge_timeline.py`.
+Script của nhóm (không có sẵn trong repo gốc): `scripts/render_dashboard.py`, `scripts/prompt_ops.py`, `scripts/trace_evidence.py`, `scripts/challenge_timeline.py`, `scripts/pii_evidence.py`.
 
 **Kiểm tra secret và PII trong Git** (đã chạy trên toàn bộ file được Git theo dõi):
 

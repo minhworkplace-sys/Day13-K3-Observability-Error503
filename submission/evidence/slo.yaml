@@ -1,0 +1,19 @@
+service: day13-observability-lab
+window: 28d
+slis:
+  latency_p95_ms:
+    objective: 3000
+    target: 99.5
+    note: >-
+      Baseline đo được ~200ms nên 3000ms là ngưỡng rất rộng; giữ nguyên để cùng
+      giá trị với panel latency và alert chat_latency_p95_slo_breach. Incident
+      rag_slow thêm 2500ms vào mỗi request nên sẽ phá ngưỡng này ngay.
+  error_rate_pct:
+    objective: 2
+    target: 99.0
+  daily_cost_usd:
+    objective: 2.5
+    target: 100.0
+  quality_score_avg:
+    objective: 0.75
+    target: 95.0

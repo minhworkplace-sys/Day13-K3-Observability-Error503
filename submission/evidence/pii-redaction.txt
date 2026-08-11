@@ -1,0 +1,28 @@
+Bằng chứng PII redaction
+
+Quét bằng chính bộ regex của validate_logs.py, độc lập với app/pii.py.
+
+Cột 'input thô' hiển thị nguyên văn để đối chiếu được trước/sau. Đây là dữ liệu
+mẫu tổng hợp của lab, đã có sẵn trong data/sample_queries.jsonl của repo gốc —
+không phải PII của người thật và không phải log của hệ thống.
+
+[s01] loại PII trong input: email
+  input thô     : What is your refund policy? My email is student@vinuni.edu.vn
+  log ghi ra    : What is your refund policy? My email is [REDACTED_EMAIL]
+  user_id       : u01 -> user_id_hash=2055254ee30a
+  quét lại log  : KHÔNG còn PII nào
+
+[s05] loại PII trong input: phone_vn
+  input thô     : Here is my phone 0987654321, what should be logged?
+  log ghi ra    : Here is my phone [REDACTED_PHONE_VN], what should be logged?
+  user_id       : u05 -> user_id_hash=64f6ec689229
+  quét lại log  : KHÔNG còn PII nào
+
+[s09] loại PII trong input: credit_card
+  input thô     : What is the policy for PII and credit card 4111 1111 1111 1111?
+  log ghi ra    : What is the policy for PII and credit card [REDACTED_CREDIT_CARD]?
+  user_id       : u09 -> user_id_hash=4d14d5d4f719
+  quét lại log  : KHÔNG còn PII nào
+
+Tổng: 3 request có PII trong input, 42 log record liên quan, 0 chuỗi PII còn sót.
+user_id không bao giờ được ghi nguyên văn — chỉ có SHA-256 cắt 12 ký tự (app/pii.py:hash_user_id).

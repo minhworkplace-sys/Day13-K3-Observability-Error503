@@ -6,7 +6,7 @@
 ## 1. Thông tin nhóm
 
 - Tên nhóm: ⬜
-- Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability
+- Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability-Error503 (nhánh `Thinh`)
 - Commit SHA cuối: ⬜ (điền sau khi commit phần việc của lab)
 - Thành viên và vai trò: ⬜
 

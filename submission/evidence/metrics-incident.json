@@ -1,12 +1,1 @@
-{
-  "traffic": 15,
-  "latency_p50": 151.0,
-  "latency_p95": 2651.0,
-  "latency_p99": 2651.0,
-  "avg_cost_usd": 0.0022,
-  "total_cost_usd": 0.0324,
-  "tokens_in_total": 492,
-  "tokens_out_total": 2062,
-  "error_breakdown": {},
-  "quality_avg": 0.8733
-}
+{"traffic":75,"latency_p50":152.0,"latency_p95":2652.0,"latency_p99":2654.0,"avg_cost_usd":0.0021,"total_cost_usd":0.1565,"tokens_in_total":2472,"tokens_out_total":9940,"error_breakdown":{},"quality_avg":0.8787}

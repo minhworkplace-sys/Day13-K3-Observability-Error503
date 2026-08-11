@@ -12,7 +12,9 @@ CORPUS = {
 }
 
 
-@observe(as_type="retriever")
+# capture_input=False vì `message` là câu hỏi thô của người dùng, có thể chứa PII —
+# log đã redact rồi thì trace cũng không được phép giữ bản chưa che.
+@observe(name="rag_retrieve", as_type="retriever", capture_input=False, capture_output=False)
 def retrieve(message: str) -> list[str]:
     if STATE["tool_fail"]:
         raise RuntimeError("Vector store timeout")

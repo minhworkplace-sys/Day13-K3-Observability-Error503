@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass
 
 from .incidents import STATE
+from .tracing import observe
 
 
 @dataclass
@@ -24,6 +25,10 @@ class FakeLLM:
     def __init__(self, model: str = "claude-sonnet-4-5") -> None:
         self.model = model
 
+    # Có span riêng cho bước generate thì waterfall mới tách được thời gian LLM khỏi
+    # thời gian retrieval; thiếu nó, trace chỉ còn một thanh duy nhất và không khoanh
+    # vùng được span bất thường. Không capture input/output vì prompt chứa câu hỏi người dùng.
+    @observe(name="llm_generate", capture_input=False, capture_output=False)
     def generate(self, prompt: str) -> FakeResponse:
         time.sleep(0.15)
         input_tokens = max(20, len(prompt) // 4)

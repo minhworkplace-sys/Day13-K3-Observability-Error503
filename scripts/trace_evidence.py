@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -44,12 +45,37 @@ def fetch(limit: int, since_minutes: int | None, session: str | None = None) -> 
         params["fromTimestamp"] = since.isoformat().replace("+00:00", "Z")
 
     with httpx.Client(auth=(public, secret), timeout=30.0) as client:
-        response = client.get(f"{host}/api/public/traces", params=params)
-        response.raise_for_status()
-        return response.json().get("data", [])
+        for attempt in range(5):
+            response = client.get(f"{host}/api/public/traces", params=params)
+            if response.status_code == 429:
+                time.sleep(float(response.headers.get("retry-after") or 0) or 5 * 2**attempt)
+                continue
+            response.raise_for_status()
+            return response.json().get("data", [])
+    raise SystemExit("Langfuse chặn tần suất khi liệt kê trace; thử lại sau ít phút")
 
 
-def render(traces: list[dict]) -> str:
+def fetch_observations(trace_id: str) -> list[dict]:
+    """Đọc span con của một trace — chính là nội dung waterfall ở dạng text.
+
+    Langfuse Cloud giới hạn tần suất gọi API, nên chờ và thử lại khi gặp 429 thay vì
+    hỏng cả file evidence chỉ vì một request bị chặn.
+    """
+    host = os.environ.get("LANGFUSE_HOST", "https://cloud.langfuse.com").rstrip("/")
+    auth = (os.environ["LANGFUSE_PUBLIC_KEY"], os.environ["LANGFUSE_SECRET_KEY"])
+    with httpx.Client(auth=auth, timeout=30.0) as client:
+        for attempt in range(5):
+            response = client.get(f"{host}/api/public/traces/{trace_id}")
+            if response.status_code == 429:
+                time.sleep(float(response.headers.get("retry-after") or 0) or 5 * 2**attempt)
+                continue
+            response.raise_for_status()
+            observations = response.json().get("observations", [])
+            return sorted(observations, key=lambda item: item.get("startTime") or "")
+    raise SystemExit(f"Langfuse chặn tần suất khi đọc span của trace {trace_id}")
+
+
+def render(traces: list[dict], with_spans: bool = False) -> str:
     if not traces:
         return "Không có trace nào trong khoảng thời gian đã chọn."
 
@@ -64,6 +90,13 @@ def render(traces: list[dict]) -> str:
             f"  user_id_hash={trace.get('userId')}  session={trace.get('sessionId')}  tags=[{tags}]\n"
             f"  latency={trace.get('latency')}  {prompt}"
         )
+        if with_spans:
+            for observation in fetch_observations(trace.get("id", "")):
+                kind = observation.get("type", "?")
+                name = observation.get("name", "?")
+                latency = observation.get("latency")
+                parent = "root" if not observation.get("parentObservationId") else "child"
+                lines.append(f"    [{parent:5}] {kind:11} {name:34} latency={latency}s")
     return "\n".join(lines)
 
 
@@ -73,10 +106,15 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--since-minutes", type=int, default=None)
     parser.add_argument("--session", default=None, help="Lọc theo session_id")
+    parser.add_argument(
+        "--spans",
+        action="store_true",
+        help="In kèm span con của từng trace (waterfall dạng text).",
+    )
     parser.add_argument("--out", type=Path, default=None)
     args = parser.parse_args()
 
-    report = render(fetch(args.limit, args.since_minutes, args.session))
+    report = render(fetch(args.limit, args.since_minutes, args.session), with_spans=args.spans)
     print(report)
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)

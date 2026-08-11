@@ -1,27 +1,27 @@
 {
   "baseline": {
-    "traffic": 10,
-    "latency_p50": 150.0,
-    "latency_p95": 1255.0,
-    "latency_p99": 1255.0,
+    "traffic": 70,
+    "latency_p50": 152.0,
+    "latency_p95": 153.0,
+    "latency_p99": 1196.0,
     "avg_cost_usd": 0.0021,
-    "total_cost_usd": 0.0206,
-    "tokens_in_total": 330,
-    "tokens_out_total": 1308,
+    "total_cost_usd": 0.1458,
+    "tokens_in_total": 2310,
+    "tokens_out_total": 9261,
     "error_breakdown": {},
     "quality_avg": 0.88
   },
   "incident": {
-    "traffic": 15,
-    "latency_p50": 151.0,
-    "latency_p95": 2651.0,
-    "latency_p99": 2651.0,
-    "avg_cost_usd": 0.0022,
-    "total_cost_usd": 0.0324,
-    "tokens_in_total": 492,
-    "tokens_out_total": 2062,
+    "traffic": 75,
+    "latency_p50": 152.0,
+    "latency_p95": 2652.0,
+    "latency_p99": 2654.0,
+    "avg_cost_usd": 0.0021,
+    "total_cost_usd": 0.1565,
+    "tokens_in_total": 2472,
+    "tokens_out_total": 9940,
     "error_breakdown": {},
-    "quality_avg": 0.8733
+    "quality_avg": 0.8787
   },
-  "latency_p95_delta_ms": 1396.0
+  "latency_p95_delta_ms": 2499.0
 }

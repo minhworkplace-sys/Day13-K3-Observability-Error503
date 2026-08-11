@@ -34,7 +34,8 @@ Môi trường: Python 3.11.9, Langfuse Cloud (`https://cloud.langfuse.com`), fa
 **PII redaction** — `scrub_event` được đăng ký trong pipeline `structlog` **trước** processor ghi file, nên dữ liệu chưa che không bao giờ chạm đĩa. Pattern trong `app/pii.py`: email, thẻ tín dụng, số điện thoại VN (5 định dạng), CCCD 12 số, hộ chiếu VN, địa chỉ VN theo số nhà + từ khoá hành chính.
 
 - Evidence PII redaction: log của `u01` (input có `student@vinuni.edu.vn`) ghi `message_preview` thành `[REDACTED_EMAIL]`; `u05` (`0987654321`) và `u09` (thẻ `4111 1111 1111 1111`) tương tự. `validate_logs.py` quét PII bằng regex độc lập với code redaction và báo 0 leak.
-- Evidence trace waterfall: ⬜ ảnh chụp một trace trên Langfuse (mở bất kỳ trace ID nào trong `evidence/traces-challenge.txt`).
+- Evidence trace: `evidence/trace-baseline-v1.jpg` cho thấy cây span `run` → `run` (generation) kèm trace ID, session, tags và latency; ảnh đặt ở mục 4.
+- Evidence trace waterfall: ⬜ chưa có ảnh waterfall bung hết span — mở một trace ID trong `evidence/traces-challenge.txt` rồi chụp.
 
 **Một span đáng chú ý** — trace `f5c38deff56a53029bbf4dea5c6eaa49` (session `k3-challenge-s03`) báo `latency=2.652s`, trong đó ~2.5s nằm ở bước retrieval và ~0.15s ở generation. Nhưng client gửi request này phải chờ **13.28s**. Khoảng chênh 10.6s không nằm trong bất kỳ span nào — đó chính là manh mối của phần 6.
 
@@ -66,9 +67,31 @@ python scripts/prompt_ops.py label --version 1 --labels production baseline    #
 
 Trạng thái label sau khi rollback: `v1 = [baseline, production]`, `v2 = [candidate, latest]`.
 
-- Evidence text: `evidence/traces-prompt-versions.txt`
-- ⬜ Ảnh danh sách hai prompt version trên Langfuse
-- ⬜ Ảnh trước/sau khi đổi label `production`
+### Evidence
+
+Danh sách hai prompt version, kèm label của từng version:
+
+![Hai prompt version day13-chat](evidence/prompt-versions.jpg)
+
+Trace chạy với label `baseline` → dùng v1. Ảnh trái có trace ID để đối chiếu, ảnh phải là phần metadata tương ứng:
+
+![Trace baseline](evidence/trace-baseline-v1.jpg)
+
+![Metadata trace baseline: prompt_version=1](evidence/trace-baseline-v1-metadata.jpg)
+
+Trace chạy với label `candidate` → dùng v2:
+
+![Trace candidate](evidence/trace-candidate-v2.jpg)
+
+![Metadata trace candidate: prompt_version=2](evidence/trace-candidate-v2-metadata.jpg)
+
+Đổi label và rollback — cùng một khung hình, chỉ có chip `production` xanh nhảy từ `#2` xuống `#1`, các label còn lại đứng yên:
+
+![Trước rollback: production ở v2](evidence/rollback-before.jpg)
+
+![Sau rollback: production về v1](evidence/rollback-after.jpg)
+
+Evidence dạng text: `evidence/traces-prompt-versions.txt`.
 
 ## 5. Dashboard, SLO và alerts
 
@@ -85,7 +108,11 @@ Trạng thái label sau khi rollback: `v1 = [baseline, production]`, `v2 = [cand
 | tokens | 4.287 | mỗi field ≤ 50.000 | đạt |
 | quality | 0,858 | mean ≥ 0,75 | đạt |
 
-- Evidence dashboard: `evidence/dashboard.html` và `evidence/dashboard-baseline.html`. ⬜ Chụp màn hình cả hai (đã hiện sẵn tên panel, time range 60 phút, refresh 30s, đơn vị và threshold).
+![Dashboard 6 panel](evidence/dashboard.jpg)
+
+![Kết quả validate_dashboard.py](evidence/validator-dashboard.jpg)
+
+Bản HTML tương tác nằm ở `evidence/dashboard.html` (sau sự cố) và `evidence/dashboard-baseline.html` (trước sự cố); mở bằng trình duyệt sẽ có tooltip trên từng điểm dữ liệu và bảng số liệu dưới mỗi panel. Kết quả `validate_logs.py` (100/100) lưu ở `evidence/validate-logs.txt`.
 
 **SLO đã chọn và lý do** (`config/slo.yaml`) — bốn SLI bám đúng bốn nhóm rủi ro khác nhau: latency p95 ≤ 3000ms (trải nghiệm chờ), error rate ≤ 2% (lỗi thấy được), cost ≤ $2,5/ngày (ngân sách), quality mean ≥ 0,75 (lỗi âm thầm mà hai chỉ số đầu không bắt được). Baseline đo được p95 ≈ 1.255 ms nên ngưỡng 3.000 ms còn rất nhiều dư địa; đây là lựa chọn có chủ ý để alert chỉ kêu khi thực sự bất thường.
 

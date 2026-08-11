@@ -7,7 +7,7 @@
 
 - Tên nhóm: Error503
 - Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability-Error503
-- Commit SHA cuối: nhánh `HoangMinh`; commit chứa bản report và evidence này là `8651ee1` ("feat: thêm span rag_retrieve/llm_generate và chạy lại evidence challenge"). Trước khi nộp lên Codelabs, lấy SHA đầy đủ của commit cuối cùng bằng `git rev-parse HEAD` (sẽ đổi sau khi commit thêm ảnh chụp ở mục 8).
+- Commit SHA cuối: nhánh `HoangMinh`; commit chứa bản report và evidence này là `732d2d9` ("feat: chạy lại toàn bộ evidence trong project Langfuse của nhóm"). Trước khi nộp lên Codelabs, lấy SHA đầy đủ của commit cuối cùng bằng `git rev-parse HEAD` (sẽ đổi sau khi commit thêm ảnh chụp ở mục 8).
 - Thành viên và vai trò: 
 Nguyễn Hoàng Minh	2A202601229 QA
 Nguyễn Gia Thiều	2A202601759 Backend Engineer

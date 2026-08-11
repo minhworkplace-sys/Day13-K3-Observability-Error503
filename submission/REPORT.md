@@ -1,13 +1,13 @@
 # Báo cáo Day 13 Observability
 
-> Các dòng đánh dấu ⬜ là phần phải tự điền: thông tin nhóm, phân công và ảnh chụp màn hình.
+> Các dòng đánh dấu ⬜ là phần còn phải tự làm: ảnh chụp màn hình (gom đủ ở [mục 8](#8-checklist-ảnh-chụp-còn-thiếu)) và cột "Điều đã học" của từng thành viên.
 > Mọi số liệu còn lại trong báo cáo đều lấy từ file trong `submission/evidence/` và có thể kiểm chứng lại.
 
 ## 1. Thông tin nhóm
 
 - Tên nhóm: Error503
 - Repository URL: https://github.com/minhworkplace-sys/Day13-K3-Observability-Error503
-- Commit SHA cuối: ⬜ (điền sau khi commit phần việc của lab)
+- Commit SHA cuối: `d04eacb37ea44203bdb07f64a669823429d1a92f` (nhánh `HoangMinh`) — cập nhật lại nếu còn commit thêm ảnh chụp ở mục 8
 - Thành viên và vai trò: 
 Nguyễn Hoàng Minh	2A202601229 QA
 Nguyễn Gia Thiều	2A202601759 Backend Engineer
@@ -19,7 +19,7 @@ Nguyễn Quốc Thịnh	2A202601675 SRE & Alerts Engineer
 |---|---|---|
 | `validate_logs.py` | **100/100** — 78 record, 35 correlation ID, 0 thiếu field, 0 PII leak | `evidence/validate-logs.txt` |
 | `validate_dashboard.py` | **HỢP LỆ: 6/6 panel** | `evidence/validate-dashboard.txt` |
-| Traces trên Langfuse | **29 trace** có metadata (10 baseline + 4 prompt version + 10 baseline lần 2 + 5 challenge) | `evidence/traces-*.txt` |
+| Traces trên Langfuse | **29 trace** có metadata (10 baseline + 4 prompt version + 10 baseline lần 2 + 5 challenge) | `evidence/traces-baseline.txt` (10 trace), `evidence/traces-prompt-versions.txt` (4), `evidence/traces-challenge.txt` (6) |
 | PII leak còn lại | **0** | `evidence/validate-logs.txt` |
 | Dashboard | `evidence/dashboard.html` (mở bằng trình duyệt), bản trước sự cố ở `evidence/dashboard-baseline.html` | `evidence/dashboard*.html` |
 | Public tests | 22 passed | `python -m pytest -q` |
@@ -105,8 +105,13 @@ Mỗi alert có ngưỡng số lượng request tối thiểu để vài request
 
 ## 6. Điều tra challenge
 
-- **Challenge ID**: `day13-k3-observability-v1` (cohort K3, incident `rag_slow`, feature `refund`, seed 1303)
+- **Challenge ID**: `day13-k3-observability-v1` (cohort K3, incident `rag_slow`, feature `refund`, seed 1303, `latency_threshold_ms = 2000`)
+- Input chính thức: 5 query trong `config/challenge.json` (session `k3-challenge-s01`…`s05`). File này **không bị sửa**.
 - Lệnh đã chạy: `python scripts/inject_incident.py` rồi `python scripts/load_test.py --challenge --concurrency 5`
+
+**Kết luận một dòng**: incident `rag_slow` thêm 2,5s vào bước retrieval; lỗi kiến trúc `async def` gọi hàm đồng bộ biến 2,5s đó thành 13,3s ở phía người dùng, đồng thời cách đo latency hiện tại giấu toàn bộ phần khuếch đại này khỏi dashboard và alert.
+
+Năm mục dưới đây bám đúng năm bước của Checkpoint 3: chạy incident → triệu chứng từ metrics → khoanh vùng span → chứng minh bằng log → fix và phòng ngừa.
 
 ### Triệu chứng từ metrics
 
@@ -120,7 +125,9 @@ Mỗi alert có ngưỡng số lượng request tối thiểu để vài request
 | error_breakdown | {} | {} |
 | quality_avg | 0,88 | 0,873 |
 
-p50 gần như không đổi còn p95 tăng gấp đôi — dấu hiệu kinh điển của chậm ở phần đuôi, chỉ một nhóm request bị ảnh hưởng chứ không phải cả hệ thống. Không có lỗi nào, nên đây là sự cố latency thuần tuý.
+p50 gần như không đổi còn p95 tăng gấp đôi — dấu hiệu kinh điển của chậm ở phần đuôi, chỉ một nhóm request bị ảnh hưởng chứ không phải cả hệ thống. Không có lỗi nào (`error_breakdown` rỗng ở cả hai lần đo) và quality gần như không đổi (0,88 → 0,873), nên đây là sự cố latency thuần tuý chứ không phải lỗi chất lượng hay lỗi tool. Nhóm request bị ảnh hưởng chính là feature `refund` — đúng `affected_feature` mà challenge khai báo.
+
+p95 = 2.651 ms đã vượt `latency_threshold_ms = 2000` của challenge, nhưng **vẫn dưới SLO 3.000 ms của nhóm** — chi tiết này quay lại ở phần root cause.
 
 **Nhưng client lại đo được 7,9s đến 13,3s** cho chính năm request đó. Chênh lệch giữa 2,65s mà server báo và 13,3s mà người dùng chịu chính là phần đáng điều tra nhất.
 
@@ -180,11 +187,30 @@ Bằng chứng cho điểm 2 nằm ở cột "nhận (t+s)": nếu app xử lý 
 
 ## 7. Đóng góp cá nhân
 
-⬜ Điền theo đúng người thật đã làm từng phần và commit tương ứng. Phần khai ở đây phải khớp với lịch sử Git.
+Bảng dưới được dựng từ `git log --all`; tài khoản Git được map sang tên thật như sau — **mỗi thành viên kiểm tra lại dòng của mình trước khi nộp**, cột "Điều đã học" phải tự viết.
 
-| Thành viên | Phần việc | Commit/PR | Điều đã học |
-|---|---|---|---|
-| | | | |
+| Thành viên | Tài khoản Git | Phần việc | Commit/PR | Điều đã học |
+|---|---|---|---|---|
+| Nguyễn Hoàng Minh (QA) | `Hoàng Minh` / minhworkplace@gmail.com | Setup baseline và evidence checkpoint 0 (`health.png`); chạy validator; tổng hợp và viết `submission/REPORT.md`; merge nhánh của các thành viên | `39d6a99` (CP0), `709ff3d` (merge `origin/Thinh`), `85089ae` + commit cuối (report) | ⬜ |
+| Nguyễn Gia Thiều (Backend Engineer) | `thieunguyen879` | Checkpoint 1: logging JSON, correlation ID middleware, enrichment metadata, PII redaction; instrument trace trong `app/agent.py`; incident hook `mock_rag` | `bf5c68a` (cp1), `caa0fd2` (evidence cp1.png), `f60d13c` (merge) | ⬜ |
+| Nguyễn Quốc Thịnh (SRE & Alerts Engineer) | `ngthomas562-hub` | Checkpoint 2 và 3: `scripts/render_dashboard.py`, `scripts/prompt_ops.py`, `scripts/trace_evidence.py`; `config/slo.yaml`, `config/alert_rules.yaml`, `docs/alerts.md`; thu thập toàn bộ evidence challenge | `307ebd9` | ⬜ |
+
+Các commit `b95464c`, `f1a02e5`, `7a57bfb`, `cd84f4f` là của Lab Coach (`HungBil`) trong repo gốc, không tính vào đóng góp của nhóm.
+
+⬜ **Lưu ý cần xử lý trước khi nộp**: commit `caa0fd2` (`submission/evidence/cp1.png`) hiện chỉ nằm trên nhánh `origin/feature/thieu`, chưa được merge vào nhánh nộp — merge vào rồi mới push, nếu không ảnh evidence checkpoint 1 sẽ không có trong bài.
+
+## 8. Checklist ảnh chụp còn thiếu
+
+Toàn bộ số liệu và evidence dạng text/HTML đã đủ. Chỉ còn bốn ảnh phải chụp tay, lưu vào `submission/evidence/` đúng tên dưới đây:
+
+| File cần chụp | Chụp ở đâu | Phục vụ mục nào |
+|---|---|---|
+| `trace-waterfall.png` | Langfuse → mở trace `f5c38deff56a53029bbf4dea5c6eaa49`, để thấy span retrieval ~2,5s | Mục 3, yêu cầu "một trace waterfall" |
+| `prompt-versions.png` | Langfuse → Prompts → `day13-chat`, thấy v1 và v2 cùng label | Mục 4 |
+| `prompt-label-rollback.png` | Langfuse → `day13-chat`, trạng thái label sau rollback (`v1 = baseline, production`) | Mục 4 |
+| `dashboard.png` / `dashboard-baseline.png` | Mở `evidence/dashboard.html` và `evidence/dashboard-baseline.html` bằng trình duyệt rồi chụp | Mục 5 |
+
+Đã có sẵn: `health.png` (checkpoint 0). Còn `cp1.png` nằm ở nhánh `feature/thieu` — xem lưu ý ở mục 7.
 
 ## Phụ lục — cách chạy lại toàn bộ
 
@@ -206,3 +232,10 @@ python -m pytest -q                                 # 22 passed
 ```
 
 Script của nhóm (không có sẵn trong repo gốc): `scripts/render_dashboard.py`, `scripts/prompt_ops.py`, `scripts/trace_evidence.py`.
+
+**Kiểm tra secret và PII trong Git** (đã chạy trên toàn bộ file được Git theo dõi):
+
+- `.env` không được commit — `.gitignore` chặn `.env`, `.venv/`, `data/logs.jsonl`, `data/audit.jsonl`; chỉ `.env.example` nằm trong repo và không chứa key thật.
+- `git grep` tìm `sk-lf-` / `pk-lf-` chỉ khớp phần placeholder trong `SETUP.md` (`pk-lf-...`, `sk-lf-...`), không có key thật.
+- Quét regex email / số thẻ / số điện thoại trên `submission/evidence/*` không có kết quả thật; log evidence chỉ chứa `user_id_hash` và `message_preview` đã redact.
+- `config/challenge.json` giữ nguyên như Lab Coach release.
